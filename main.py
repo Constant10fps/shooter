@@ -1,3 +1,4 @@
+from typing import Any
 from pygame import *
 winWidth = 1200
 winHeight = 900
@@ -14,7 +15,9 @@ mixer.music.set_volume(0.2)
 class GameSprite(sprite.Sprite):
     """docstring for ClassName."""
     def __init__(self, p_image, size: tuple, start_pos: tuple, speed: int):
-        super.__init__()
+        super().__init__()
+        self.width = size[0]
+        self.height = size[1]
         self.image = transform.scale(image.load(p_image), size)
         self.speed = speed
         self.rect = self.image.get_rect()
@@ -23,6 +26,21 @@ class GameSprite(sprite.Sprite):
     def show(self):
         window.blit(self.image, (self.rect.x, self.rect.y))
 
+
+class Player(GameSprite):
+    def update(self):
+        keys = key.get_pressed()
+        if (keys[K_a] or keys[K_LEFT]) and self.rect.x > 5:
+            self.rect.x -= self.speed
+        if (keys[K_d] or keys[K_RIGHT]) and self.rect.x < winWidth - self.width - 5:
+            self.rect.x += self.speed
+        if (keys[K_w] or keys[K_SPACE] or keys[K_UP]):
+            self.fire()
+    def fire(self):
+        pass    
+
+
+player = Player("spaceship.png", (150, 150), (winWidth//2, winHeight - 150), 10)
 
 #~~~~~~~#
 game = True
@@ -36,5 +54,7 @@ while game:
                 quit()
                 game = False
     window.blit(background, (0,0))
+    player.show()
+    player.update()
     display.update()
     clock.tick(60)
