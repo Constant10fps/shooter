@@ -4,10 +4,10 @@ from pygame import *
 winWidth = 1200
 winHeight = 900
 #~~~~~Background~~~~~~#
-window = display.set_mode((winWidth, winHeight))
-display.set_caption("Sʜᴏᴏᴛᴇʀ")
-background = transform.scale(image.load("skybox.jpg"), (winWidth, winHeight))
-
+window = display.set_mode((winWidth, winHeight)) # Setting the size
+display.set_caption("Sʜᴏᴏᴛᴇʀ") # Name of the window
+background = transform.scale(image.load("skybox.jpg"), (winWidth, winHeight)) # background
+#~~~~~~~~Music~~~~~~~~#
 mixer.init()
 mixer.music.load("-Electroman-Adventures-.mp3")
 mixer.music.play(loops=-1)
@@ -39,9 +39,12 @@ class Player(GameSprite):
     def fire(self):
         pass
 
-
+class Bullet(GameSprite):
+    def update(self):
+        self.rect.y -= self.speed
 player = Player("spaceship.png", (150, 150), (winWidth//2, winHeight - 150), 10)
-bullets = []
+bullets = [Bullet("bullet.png", (75, 75), (winWidth//2, winHeight - 150), 10)]
+aliens = []
 #~~~~~Game phases~~~~~#
 menu = False
 lvl_play = True
@@ -72,6 +75,12 @@ while game:
             pass
         player.show()
         player.update()
+        for bullet in bullets:
+            if bullet.rect.y > 5:
+                bullet.show()
+                bullet.update()
+            else:
+                bullets.remove(bullet)
     if lvl_restart:
         pass
     display.update()
