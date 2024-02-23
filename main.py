@@ -40,7 +40,7 @@ class Player(GameSprite):
                 self.fire()
                 fire_cooldown = 25
     def fire(self):
-        new_bullet = Bullet("bullet.png", (75, 75), (self.rect.x, self.rect.y), 7)
+        new_bullet = Bullet("bullet.png", (75, 75), (self.rect.x + 37, self.rect.y + 37), 7)
         bullets.append(new_bullet)
         
 
@@ -78,14 +78,14 @@ while game:
             pass
         if lvl_boss:
             pass
-        player.show()
-        player.update()
         for bullet in bullets:
             if bullet.rect.y > 5:
                 bullet.show()
                 bullet.update()
             else:
                 bullets.remove(bullet)
+        player.show()
+        player.update()
     if lvl_restart:
         pass
     if fire_cooldown > 0:
