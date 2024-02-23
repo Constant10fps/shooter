@@ -1,8 +1,9 @@
+#~~~~~~~Import~~~~~~~~#
 from typing import Any
 from pygame import *
 winWidth = 1200
 winHeight = 900
-#~~~~~~~~#
+#~~~~~Background~~~~~~#
 window = display.set_mode((winWidth, winHeight))
 display.set_caption("Sʜᴏᴏᴛᴇʀ")
 background = transform.scale(image.load("skybox.jpg"), (winWidth, winHeight))
@@ -11,9 +12,8 @@ mixer.init()
 mixer.music.load("-Electroman-Adventures-.mp3")
 mixer.music.play(loops=-1)
 mixer.music.set_volume(0.2)
-#~~~~~~~#
+#~~~~~~~Classes~~~~~~~#
 class GameSprite(sprite.Sprite):
-    """docstring for ClassName."""
     def __init__(self, p_image, size: tuple, start_pos: tuple, speed: int):
         super().__init__()
         self.width = size[0]
@@ -41,14 +41,15 @@ class Player(GameSprite):
 
 
 player = Player("spaceship.png", (150, 150), (winWidth//2, winHeight - 150), 10)
-
+bullets = []
+#~~~~~Game phases~~~~~#
 menu = False
 lvl_play = True
 lvl_1 = False
 lvl_2 = False
 lvl_boss = False
 lvl_restart = False
-#~~~~~~~#
+#~~~~~~~~START~~~~~~~~#
 game = True
 clock = time.Clock()
 while game:
