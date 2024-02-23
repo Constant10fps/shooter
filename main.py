@@ -37,11 +37,17 @@ class Player(GameSprite):
         if (keys[K_w] or keys[K_SPACE] or keys[K_UP]):
             self.fire()
     def fire(self):
-        pass    
+        pass
 
 
 player = Player("spaceship.png", (150, 150), (winWidth//2, winHeight - 150), 10)
 
+menu = False
+lvl_play = True
+lvl_1 = False
+lvl_2 = False
+lvl_boss = False
+lvl_restart = False
 #~~~~~~~#
 game = True
 clock = time.Clock()
@@ -54,7 +60,18 @@ while game:
                 quit()
                 game = False
     window.blit(background, (0,0))
-    player.show()
-    player.update()
+    if menu:
+        pass
+    if lvl_play:
+        if lvl_1:
+            pass
+        if lvl_2:
+            pass
+        if lvl_boss:
+            pass
+        player.show()
+        player.update()
+    if lvl_restart:
+        pass
     display.update()
     clock.tick(60)
