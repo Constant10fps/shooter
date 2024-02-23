@@ -26,7 +26,7 @@ class GameSprite(sprite.Sprite):
     def show(self):
         window.blit(self.image, (self.rect.x, self.rect.y))
 
-
+fire_cooldown: int = 0
 class Player(GameSprite):
     def update(self):
         keys = key.get_pressed()
@@ -35,15 +35,20 @@ class Player(GameSprite):
         if (keys[K_d] or keys[K_RIGHT]) and self.rect.x < winWidth - self.width - 5:
             self.rect.x += self.speed
         if (keys[K_w] or keys[K_SPACE] or keys[K_UP]):
-            self.fire()
+            global fire_cooldown
+            if not fire_cooldown:
+                self.fire()
+                fire_cooldown = 25
     def fire(self):
-        pass
+        new_bullet = Bullet("bullet.png", (75, 75), (self.rect.x, self.rect.y), 7)
+        bullets.append(new_bullet)
+        
 
 class Bullet(GameSprite):
     def update(self):
         self.rect.y -= self.speed
 player = Player("spaceship.png", (150, 150), (winWidth//2, winHeight - 150), 10)
-bullets = [Bullet("bullet.png", (75, 75), (winWidth//2, winHeight - 150), 10)]
+bullets = []
 aliens = []
 #~~~~~Game phases~~~~~#
 menu = False
@@ -83,5 +88,7 @@ while game:
                 bullets.remove(bullet)
     if lvl_restart:
         pass
+    if fire_cooldown > 0:
+        fire_cooldown -= 1
     display.update()
     clock.tick(60)
