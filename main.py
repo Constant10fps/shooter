@@ -26,7 +26,7 @@ class GameSprite(sprite.Sprite):
     def show(self):
         window.blit(self.image, (self.rect.x, self.rect.y))
 
-fire_cooldown: int = 0
+
 class Player(GameSprite):
     def update(self):
         keys = key.get_pressed()
@@ -44,10 +44,21 @@ class Player(GameSprite):
         bullets.append(new_bullet)
         
 
+
 class Bullet(GameSprite):
     def update(self):
         self.rect.y -= self.speed
-player = Player("spaceship.png", (150, 150), (winWidth//2, winHeight - 150), 10)
+
+
+class Shield(GameSprite):
+    def update(self):
+        self.rect.x = player.rect.x - 25
+        self.rect.y = player.rect.y - 25
+
+
+fire_cooldown: int = 0
+player = Player("spaceship.png", (150, 150), (winWidth // 2, winHeight - 150), 10)
+shield = Shield("shield.png", (200, 200), ((winWidth // 2) - 25, winHeight - 175), 10)
 bullets = []
 aliens = []
 #~~~~~Game phases~~~~~#
@@ -86,6 +97,8 @@ while game:
                 bullets.remove(bullet)
         player.show()
         player.update()
+        shield.show()
+        shield.update()
     if lvl_restart:
         pass
     if fire_cooldown > 0:
