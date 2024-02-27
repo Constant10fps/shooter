@@ -1,6 +1,5 @@
 #~~~~~~~Import~~~~~~~~#
 from random import randint as ri
-from typing import Any
 from pygame import *
 winWidth = 1200
 winHeight = 900
@@ -82,7 +81,7 @@ bullets_SPRITE: sprite.Group = sprite.Group()
 killcount: int = 0
 #~~Counter displays~~#
 font.init()
-stats = font.Font("stats.ttf", 40)
+stats = font.Font("stats.ttf", 30)
 lost = 0
 #~~~~~Game phases~~~~~#
 menu = False
@@ -127,8 +126,8 @@ while game:
         show_update(shield)
         killcount_text = stats.render(f"Killcount: {killcount}", True, (0, 255, 51))
         lost_text = stats.render(f"Lost: {lost}", True, (0, 255, 51))
-        window.blit(killcount_text, (10, 30))
-        window.blit(lost_text, (10, 80))
+        window.blit(killcount_text, (10, 20))
+        window.blit(lost_text, (10, 60))
     if lvl_restart:
         pass
     if fire_cooldown > 0:
