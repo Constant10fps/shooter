@@ -77,9 +77,13 @@ fire_cooldown: int = 0
 timer: int = 60
 player = Player("spaceship.png", (150, 150), (winWidth // 2, winHeight - 150), 10)
 shield = Shield("shield.png", (200, 200), ((winWidth // 2) - 25, winHeight - 175), 10)
-aliens = sprite.Group()
-points = 0
-bullets_SPRITE = sprite.Group()
+aliens: sprite.Group = sprite.Group()
+bullets_SPRITE: sprite.Group = sprite.Group()
+killcount: int = 0
+#~~Counter displays~~#
+font.init()
+stats = font.Font("stats.ttf", 40)
+lost = 0
 #~~~~~Game phases~~~~~#
 menu = False
 lvl_play = True
@@ -91,6 +95,46 @@ lvl_restart = False
 game = True
 clock = time.Clock()
 while game:
+    window.blit(background, (0,0))
+    if menu:
+        pass
+    if lvl_play:
+        if lvl_1:
+            random_spawn((-2, 2), 60, 4)
+            if killcount > 50:
+                lvl_1 = False
+                lvl_2 = True
+        if lvl_2:
+            random_spawn((-1, 1), 50, 4)
+            if killcount > 150:
+                lvl_2 = False
+                lvl_boss = True
+        if lvl_boss:
+            # Не забудь убрать когда будешь тестировать игру!
+            quit()
+            game = False
+        for alien in aliens:
+            if sprite.spritecollide(alien, bullets_SPRITE, True):
+                aliens.remove(alien)
+                killcount += 1
+            if alien.rect.y > winHeight:
+                aliens.remove(alien)
+                lost += 1
+        aliens.draw(window)
+        aliens.update()
+        collision_check(bullets_SPRITE)
+        show_update(player)
+        show_update(shield)
+        killcount_text = stats.render(f"Killcount: {killcount}", True, (0, 255, 51))
+        lost_text = stats.render(f"Lost: {lost}", True, (0, 255, 51))
+        window.blit(killcount_text, (10, 30))
+        window.blit(lost_text, (10, 80))
+    if lvl_restart:
+        pass
+    if fire_cooldown > 0:
+        fire_cooldown -= 1
+    display.update()
+    clock.tick(60)
     for e in event.get():
         if e.type == QUIT:
             game = False
@@ -98,30 +142,3 @@ while game:
             if e.key == K_ESCAPE:
                 quit()
                 game = False
-    window.blit(background, (0,0))
-    if menu:
-        pass
-    if lvl_play:
-        if lvl_1:
-            random_spawn((-2, 2), 60, 4)
-        if lvl_2:
-            pass
-        if lvl_boss:
-            pass
-        for alien in aliens:
-            if sprite.spritecollide(alien, bullets_SPRITE, True):
-                aliens.remove(alien)
-                points += 1
-            if alien.rect.y > winHeight:
-                aliens.remove(alien)
-        aliens.draw(window)
-        aliens.update()
-        collision_check(bullets_SPRITE)
-        show_update(player)
-        show_update(shield)
-    if lvl_restart:
-        pass
-    if fire_cooldown > 0:
-        fire_cooldown -= 1
-    display.update()
-    clock.tick(60)
