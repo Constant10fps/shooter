@@ -1,4 +1,5 @@
 #~~~~~~~Import~~~~~~~~#
+from random import randint as ri
 from typing import Any
 from pygame import *
 winWidth = 1200
@@ -14,7 +15,7 @@ mixer.music.play(loops=-1)
 mixer.music.set_volume(0.2)
 #~~~~~~~Classes~~~~~~~#
 class GameSprite(sprite.Sprite):
-    def __init__(self, p_image, size: tuple, start_pos: tuple, speed: int):
+    def __init__(self, p_image: str, size: tuple, start_pos: tuple, speed: int):
         super().__init__()
         self.width = size[0]
         self.height = size[1]
@@ -25,7 +26,6 @@ class GameSprite(sprite.Sprite):
         self.rect.y = start_pos[1]
     def show(self):
         window.blit(self.image, (self.rect.x, self.rect.y))
-
 
 class Player(GameSprite):
     def update(self):
@@ -40,31 +40,50 @@ class Player(GameSprite):
                 self.fire()
                 fire_cooldown = 25
     def fire(self):
-        new_bullet = Bullet("bullet.png", (75, 75), (self.rect.x + 37, self.rect.y + 37), 7)
-        bullets.append(new_bullet)
-        
-
+        bullets_SPRITE.add(Bullet("bullet.png", (75, 75), (self.rect.x + 37, self.rect.y + 37), 7))
 
 class Bullet(GameSprite):
     def update(self):
         self.rect.y -= self.speed
 
-
 class Shield(GameSprite):
-    def update(self):
+    def update(self) -> None:
         self.rect.x = player.rect.x - 25
         self.rect.y = player.rect.y - 25
 
+class Alien(GameSprite):
+    def update(self):
+        self.rect.y += self.speed
 
+def collision_check(item: sprite.Group):
+    for elem in item.sprites():
+            if elem.rect.y <= 5:
+                item.remove(elem)
+    item.draw(window)
+    item.update()
+
+def show_update(item):
+    item.show()
+    item.update()
+
+def random_spawn(ri_range: tuple, timer_reset: int, enemy_speed: int):
+    global timer
+    if timer < 0:
+        if not(ri(ri_range[0], ri_range[1])):
+            aliens.add(Alien("alien.png", (180, 120), (ri(0, winWidth - 180), -100), enemy_speed))
+            timer = timer_reset
+    timer -= 1
 fire_cooldown: int = 0
+timer: int = 60
 player = Player("spaceship.png", (150, 150), (winWidth // 2, winHeight - 150), 10)
 shield = Shield("shield.png", (200, 200), ((winWidth // 2) - 25, winHeight - 175), 10)
-bullets = []
-aliens = []
+aliens = sprite.Group()
+points = 0
+bullets_SPRITE = sprite.Group()
 #~~~~~Game phases~~~~~#
 menu = False
 lvl_play = True
-lvl_1 = False
+lvl_1 = True
 lvl_2 = False
 lvl_boss = False
 lvl_restart = False
@@ -84,21 +103,22 @@ while game:
         pass
     if lvl_play:
         if lvl_1:
-            pass
+            random_spawn((-2, 2), 60, 4)
         if lvl_2:
             pass
         if lvl_boss:
             pass
-        for bullet in bullets:
-            if bullet.rect.y > 5:
-                bullet.show()
-                bullet.update()
-            else:
-                bullets.remove(bullet)
-        player.show()
-        player.update()
-        shield.show()
-        shield.update()
+        for alien in aliens:
+            if sprite.spritecollide(alien, bullets_SPRITE, True):
+                aliens.remove(alien)
+                points += 1
+            if alien.rect.y > winHeight:
+                aliens.remove(alien)
+        aliens.draw(window)
+        aliens.update()
+        collision_check(bullets_SPRITE)
+        show_update(player)
+        show_update(shield)
     if lvl_restart:
         pass
     if fire_cooldown > 0:
