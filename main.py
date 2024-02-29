@@ -40,31 +40,25 @@ class Player(GameSprite):
                 fire_cooldown = 25
     def fire(self):
         bullets_SPRITE.add(Bullet("bullet.png", (75, 75), (self.rect.x + 37, self.rect.y + 37), 7))
-
 class Bullet(GameSprite):
     def update(self):
         self.rect.y -= self.speed
-
 class Shield(GameSprite):
     def update(self) -> None:
         self.rect.x = player.rect.x - 25
         self.rect.y = player.rect.y - 25
-
 class Alien(GameSprite):
     def update(self):
         self.rect.y += self.speed
-
 def collision_check(item: sprite.Group):
     for elem in item.sprites():
             if elem.rect.y <= 5:
                 item.remove(elem)
     item.draw(window)
     item.update()
-
 def show_update(item):
     item.show()
     item.update()
-
 def random_spawn(ri_range: tuple, timer_reset: int, enemy_speed: int):
     global timer
     if timer < 0:
@@ -83,6 +77,7 @@ killcount: int = 0
 font.init()
 stats = font.Font("stats.ttf", 30)
 lost = 0
+lives = 100
 #~~~~~Game phases~~~~~#
 menu = False
 lvl_play = True
@@ -119,6 +114,7 @@ while game:
             if alien.rect.y > winHeight:
                 aliens.remove(alien)
                 lost += 1
+                lives -= 20
         aliens.draw(window)
         aliens.update()
         collision_check(bullets_SPRITE)
@@ -126,8 +122,14 @@ while game:
         show_update(shield)
         killcount_text = stats.render(f"Killcount: {killcount}", True, (0, 255, 51))
         lost_text = stats.render(f"Lost: {lost}", True, (0, 255, 51))
+        lives_text = stats.render(f"Lives: {lives}", True, (0, 255, 51))
         window.blit(killcount_text, (10, 20))
         window.blit(lost_text, (10, 60))
+        window.blit(lives_text, (10, 100))
+        if lives == 0:
+            quit()
+            game = False
+            # Заменить перед релизом
     if lvl_restart:
         pass
     if fire_cooldown > 0:
