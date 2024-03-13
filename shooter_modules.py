@@ -9,34 +9,35 @@ class GameSprite(sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.x = start_pos[0]
         self.rect.y = start_pos[1]
-    def show(self):
-        window.blit(self.image, (self.rect.x, self.rect.y))
+    
+    def show(self, surface: Surface): # need surface
+        surface.blit(self.image, (self.rect.x, self.rect.y))
 
 class Player(GameSprite):
-    def update(self):
+    def update(self, win_width: int, fire_cooldown: int): # need width
         keys = key.get_pressed()
         if (keys[K_a] or keys[K_LEFT]) and self.rect.x > 5:
             self.rect.x -= self.speed
-        if (keys[K_d] or keys[K_RIGHT]) and self.rect.x < winWidth - self.width - 5:
+        if (keys[K_d] or keys[K_RIGHT]) and self.rect.x < win_width - self.width - 5:
             self.rect.x += self.speed
-        if (keys[K_w] or keys[K_SPACE] or keys[K_UP]):
-            global fire_cooldown
-            if not fire_cooldown:
-                self.fire()
-                fire_cooldown = 25
-    def fire(self):
-        bullets_SPRITE.add(Bullet("bullet.png", (40, 75), (self.rect.centerx - 20, self.rect.top), 7))
+
+    def fire(self, group: sprite.Group): # changed with surface
+        group.add(Bullet("bullet.png", (40, 75), (self.rect.centerx - 20, self.rect.top), 7))
 
 class Bullet(GameSprite):
     def update(self):
         self.rect.y -= self.speed
 
 class Shield(GameSprite):
-    def update(self) -> None:
+    def update(self, player: Player):
         self.rect.x = player.rect.x - 25
         self.rect.y = player.rect.y - 25
 
 class Alien(GameSprite):
+    def update(self):
+        self.rect.y += self.speed
+
+class Asteroid(GameSprite):
     def update(self):
         self.rect.y += self.speed
 
