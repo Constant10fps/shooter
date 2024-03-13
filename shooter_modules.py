@@ -1,4 +1,36 @@
+from random import randint as ri
 from pygame import *
+
+class System():
+    def __init__(self, window: Surface, winWidth: int, winHeight: int,
+                bullets_group: sprite.Group, aliens_group: sprite.Group, ast_group: sprite.Group):
+        self.window = window
+        self.width = winWidth
+        self.height = winHeight
+        self.killcount = 0
+        self.lost_count = 0
+        self.timer = 0
+        self.bullets = bullets_group
+        self.aliens = aliens_group
+        self.asteroids = ast_group
+    
+    def collision_check(self):
+        if sprite.groupcollide(self.bullets, self.aliens, True, True):
+            self.killcount += 1
+        for elem in self.bullets.sprites():
+                if elem.rect.y <= -100:
+                    self.bullets.remove(elem)
+        self.bullets.draw(self.window)
+        self.bullets.update()
+
+    def random_spawn(self, ri_range: tuple, timer_reset: int, enemy_speed: int):
+        if self.timer < 0:
+            if not(ri(ri_range[0], ri_range[1])):
+                self.aliens.add(Alien("alien.png", (180, 120), (ri(0, self.width - 180), -100), enemy_speed))
+                self.timer = timer_reset
+            if not(ri(ri_range[0]-1, ri_range[1]+1)):
+                self.asteroids.add(Asteroid("32728.jpg", (100, 100), (ri(0, self.width - 100), -200), 3))
+        self.timer -= 1
 class GameSprite(sprite.Sprite):
     def __init__(self, p_image: str, size: tuple, start_pos: tuple, speed: int):
         super().__init__()

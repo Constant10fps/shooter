@@ -15,32 +15,11 @@ mixer.music.load("-Electroman-Adventures-.mp3")
 mixer.music.play(loops=-1)
 mixer.music.set_volume(0.2)
 
-#~~~~~~~Functions~~~~~~~#
-def collision_check(item: sprite.Group):
-    global killcount
-    if sprite.groupcollide(bullets_SPRITE, aliens, True, True):
-        killcount += 1
-    for elem in item.sprites():
-            if elem.rect.y <= -100:
-                item.remove(elem)
-    item.draw(window)
-    item.update()
-
-def random_spawn(ri_range: tuple, timer_reset: int, enemy_speed: int):
-    global timer
-    if timer < 0:
-        if not(ri(ri_range[0], ri_range[1])):
-            aliens.add(Alien("alien.png", (180, 120), (ri(0, winWidth - 180), -100), enemy_speed))
-            timer = timer_reset
-        if not(ri(ri_range[0]-1, ri_range[1]+1)):
-            asteroids.add(Asteroid("32728.jpg", (100, 100), (ri(0, winWidth - 100), -200), 3))
-    timer -= 1
-
 #~~~~~~~Variables~~~~~~~#
 fire_cooldown: int = 0
 timer: int = 60
 killcount: int = 0
-lost = 0
+lost_count = 0
 restart_timer = 250
 
 player = Player("spaceship.png", (150, 150), (winWidth // 2, winHeight - 150), 10)
@@ -50,6 +29,7 @@ health_bar = HealthBar(winWidth - 530, 20, 500, 35, 100)
 aliens: sprite.Group = sprite.Group()
 asteroids = sprite.Group()
 bullets_SPRITE: sprite.Group = sprite.Group()
+system = System(window, winWidth, winHeight, bullets_SPRITE, aliens, asteroids)
 
 #~~Text displays~~#
 font.init()
@@ -78,7 +58,7 @@ while game:
     keys = key.get_pressed()
     window.blit(background, (0,0))
     if menu:
-        random_spawn((-2, 2), 60, ri(3, 5))
+        system.random_spawn((-2, 2), 60, ri(3, 5))
         for alien in aliens:
             if alien.rect.y > winHeight:
                 aliens.remove(alien)
@@ -96,18 +76,18 @@ while game:
         elif key.get_pressed()[K_ESCAPE]:
             quit()
             break
-            
+
     if lvl_play:
         # aliens lvl 1
         if lvl_1:
-            random_spawn((-2, 2), 60, ri(3, 5))
+            system.random_spawn((-2, 2), 60, ri(3, 5))
             if killcount > 50:
                 lvl_1 = False
                 lvl_2 = True
         
         # aliens lvl 2
         if lvl_2:
-            random_spawn((-1, 1), 50, ri(4, 5))
+            system.random_spawn((-1, 1), 50, ri(4, 5))
             if killcount > 150:
                 lvl_2 = False
                 lvl_boss = True
@@ -131,7 +111,7 @@ while game:
         # draw all sprites
         aliens.draw(window)
         aliens.update()
-        collision_check(bullets_SPRITE)
+        system.collision_check()
         player.show(window)
         player.update(winWidth, bullets_SPRITE)
         shield.show(window)
@@ -143,8 +123,8 @@ while game:
                     fire_cooldown = 25
         
         # text rendering
-        killcount_text = stats.render(f"Killcount: {killcount}", True, (0, 255, 51))
-        lost_text = stats.render(f"Lost: {lost}", True, (0, 255, 51))
+        killcount_text = stats.render(f"Killcount: {system.killcount}", True, (0, 255, 51))
+        lost_text = stats.render(f"Lost: {system.lost_count}", True, (0, 255, 51))
         window.blit(killcount_text, (10, 20))
         window.blit(lost_text, (10, 60))
         
@@ -156,7 +136,7 @@ while game:
         
     if lvl_restart:
         # draw all sprites
-        collision_check(bullets_SPRITE)
+        system.collision_check()
         aliens.draw(window)
         aliens.update()
         window.blit(game_over, (315, 350))
