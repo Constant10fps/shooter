@@ -21,14 +21,15 @@ timer: int = 60
 killcount: int = 0
 lost_count = 0
 restart_timer = 250
-
+# Sprites
 player = Player("spaceship.png", (150, 150), (winWidth // 2, winHeight - 150), 10)
 shield = Shield("shield.png", (200, 200), ((winWidth // 2) - 25, winHeight - 175), 10)
 health_bar = HealthBar(winWidth - 530, 20, 500, 35, 100)
-
+# Groups
 aliens: sprite.Group = sprite.Group()
 asteroids = sprite.Group()
 bullets_SPRITE: sprite.Group = sprite.Group()
+# System Object
 system = System(window, winWidth, winHeight, bullets_SPRITE, aliens, asteroids)
 
 #~~Text displays~~#
@@ -106,21 +107,19 @@ while game:
                 health_bar.hp -= 20
             if alien.rect.y > winHeight:
                 aliens.remove(alien)
-                lost += 1
+                system.lost_count += 1
                 health_bar.hp -= 10
         # draw all sprites
         aliens.draw(window)
         aliens.update()
+        asteroids.draw(window)
+        asteroids.update()
         system.collision_check()
         player.show(window)
         player.update(winWidth, bullets_SPRITE)
         shield.show(window)
         shield.update(player)
-        
-        if (keys[K_w] or keys[K_SPACE] or keys[K_UP]):
-                if not fire_cooldown:
-                    player.fire(bullets_SPRITE)
-                    fire_cooldown = 25
+        system.player_check(keys, player)
         
         # text rendering
         killcount_text = stats.render(f"Killcount: {system.killcount}", True, (0, 255, 51))
@@ -157,8 +156,6 @@ while game:
             window.blit(restart, (250, 600))
         else:
             restart_timer -= 1
-    if fire_cooldown > 0:
-        fire_cooldown -= 1
     display.update()
     clock.tick(60)
     for e in event.get():
