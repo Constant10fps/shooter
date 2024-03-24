@@ -13,7 +13,7 @@ mixer.init()
 mixer.music.load("-Electroman-Adventures-.mp3")
 
 mixer.music.play(loops=-1)
-mixer.music.set_volume(0.2)
+mixer.music.set_volume(0)
 
 #~~~~~~~Variables~~~~~~~#
 fire_cooldown: int = 0
@@ -22,6 +22,7 @@ killcount: int = 0
 lost_count = 0
 restart_timer = 250
 # Sprites
+boss = Boss("alien.png", (360, 240), (winWidth//2, 10), 5)
 player = Player("spaceship.png", (150, 150), (winWidth // 2, winHeight - 150), 10)
 shield = Shield("shield.png", (200, 200), ((winWidth // 2) - 25, winHeight - 175), 10)
 health_bar = HealthBar(winWidth - 530, 20, 500, 35, 100)
@@ -30,7 +31,7 @@ aliens: sprite.Group = sprite.Group()
 asteroids = sprite.Group()
 bullets_SPRITE: sprite.Group = sprite.Group()
 # System Object
-system = System(window, winWidth, winHeight, bullets_SPRITE, aliens, asteroids)
+system = System(window, bullets_SPRITE, aliens, asteroids)
 
 #~~Text displays~~#
 font.init()
@@ -47,7 +48,7 @@ restart = saiba_small.render("PRESS TAB TO RETURN TO MENU", True, (0, 255, 51))
 #~~~~~Game phases~~~~~#
 menu = True
 lvl_play = False
-lvl_1 = True
+lvl_1 = False
 lvl_2 = False
 lvl_boss = False
 lvl_restart = False
@@ -72,7 +73,8 @@ while game:
         if key.get_pressed()[K_RETURN]:
             aliens.empty()
             lvl_play = True
-            lvl_1 = True
+            # Debug!
+            lvl_boss = True
             menu = False
         elif key.get_pressed()[K_ESCAPE]:
             quit()
@@ -95,28 +97,15 @@ while game:
         
         # boss lvl with one enemy
         if lvl_boss:
-            # Не забудь убрать когда будешь тестировать игру!
-            quit()
-            game = False
-            break
+            boss.show(window)
+            boss.update()
         
-        # aliens check
-        for alien in aliens:
-            if sprite.collide_rect(alien, player):
-                aliens.remove(alien)
-                health_bar.hp -= 20
-            if alien.rect.y > winHeight:
-                aliens.remove(alien)
-                system.lost_count += 1
-                health_bar.hp -= 10
-        # draw all sprites
-        aliens.draw(window)
-        aliens.update()
         asteroids.draw(window)
         asteroids.update()
-        system.collision_check()
+        
+        system.collision_check(player)
         player.show(window)
-        player.update(winWidth, bullets_SPRITE)
+        player.update(bullets_SPRITE)
         shield.show(window)
         shield.update(player)
         system.player_check(keys, player)
@@ -128,14 +117,14 @@ while game:
         window.blit(lost_text, (10, 60))
         
         # health check
-        health_bar.show(window)
-        if health_bar.hp <= 0:
+        health_bar.show(system.hp, window)
+        if system.hp <= 0:
             lvl_restart = True
             lvl_play = False
         
     if lvl_restart:
         # draw all sprites
-        system.collision_check()
+        system.collision_check(player)
         aliens.draw(window)
         aliens.update()
         window.blit(game_over, (315, 350))
@@ -145,16 +134,18 @@ while game:
         # check for enter
         if not restart_timer:
             if keys[K_TAB]:
-                killcount = 0
-                lost = 0
-                health_bar.hp = 100
-                bullets_SPRITE.empty()
-                aliens.empty()
-                menu = True
                 restart_timer = 250
+                system.killcount = 0
+                system.lost_count = 0
+                system.hp = 100
+                
+                system.bullets.empty()
+                system.aliens.empty()
+                
                 lvl_restart = False
+                menu = True
             window.blit(restart, (250, 600))
-        else:
+        elif restart_timer > 0:
             restart_timer -= 1
     display.update()
     clock.tick(60)
