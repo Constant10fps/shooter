@@ -2,19 +2,21 @@
 from random import randint as ri
 from shooter_modules import *
 from pygame import *
+#~~~~~Background~~~~~~#
 winWidth = 1200
 winHeight = 900
-#~~~~~Background~~~~~~#
 window = display.set_mode((winWidth, winHeight)) # Setting the size
-display.set_caption("Sʜᴏᴏᴛᴇʀ") # Name of the window
+display.set_caption("Sʜᴏᴏᴛᴇʀ", "alien.png") # Name of the window
 background = transform.scale(image.load("skybox.jpg"), (winWidth, winHeight)) # background
+# System Object
+system = System(window)
+
 #~~~~~~~~Music~~~~~~~~#
 mixer.init()
 mixer.music.load("-Electroman-Adventures-.mp3")
 
 mixer.music.play(loops=-1)
 mixer.music.set_volume(0)
-
 #~~~~~~~Variables~~~~~~~#
 fire_cooldown: int = 0
 timer: int = 60
@@ -26,12 +28,7 @@ boss = Boss("alien.png", (360, 240), (winWidth//2, 10), 5)
 player = Player("spaceship.png", (150, 150), (winWidth // 2, winHeight - 150), 10)
 shield = Shield("shield.png", (200, 200), ((winWidth // 2) - 25, winHeight - 175), 10)
 health_bar = HealthBar(winWidth - 530, 20, 500, 35, 100)
-# Groups
-aliens: sprite.Group = sprite.Group()
-asteroids = sprite.Group()
-bullets_SPRITE: sprite.Group = sprite.Group()
-# System Object
-system = System(window, bullets_SPRITE, aliens, asteroids)
+
 
 #~~Text displays~~#
 font.init()
@@ -61,17 +58,17 @@ while game:
     window.blit(background, (0,0))
     if menu:
         system.random_spawn((-2, 2), 60, ri(3, 5))
-        for alien in aliens:
+        for alien in system.aliens:
             if alien.rect.y > winHeight:
-                aliens.remove(alien)
-        aliens.draw(window)
-        aliens.update()
+                system.aliens.remove(alien)
+        system.aliens.draw(window)
+        system.aliens.update()
         
         window.blit(logo, (100, 200))
         window.blit(start, (100, 300))
         
         if key.get_pressed()[K_RETURN]:
-            aliens.empty()
+            system.aliens.empty()
             lvl_play = True
             # Debug!
             lvl_boss = True
@@ -98,14 +95,15 @@ while game:
         # boss lvl with one enemy
         if lvl_boss:
             boss.show(window)
-            boss.update()
+            boss.update(system.boss_bullets)
         
-        asteroids.draw(window)
-        asteroids.update()
-        
+        system.asteroids.draw(window)
+        system.asteroids.update()
+        system.boss_bullets.draw(window)
+        system.boss_bullets.draw()
         system.collision_check(player)
         player.show(window)
-        player.update(bullets_SPRITE)
+        player.update(system.bullets)
         shield.show(window)
         shield.update(player)
         system.player_check(keys, player)
@@ -125,8 +123,8 @@ while game:
     if lvl_restart:
         # draw all sprites
         system.collision_check(player)
-        aliens.draw(window)
-        aliens.update()
+        system.aliens.draw(window)
+        system.aliens.update()
         window.blit(game_over, (315, 350))
         window.blit(killcount_text, (350, 460))
         window.blit(lost_text, (350, 500))

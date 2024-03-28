@@ -10,7 +10,7 @@ class GameSprite(sprite.Sprite):
     def __init__(self, p_image: str, size: tuple, start_pos: tuple, speed: int):
         super().__init__()
         self.WIN_WIDTH = 1200
-        self.WINHEIGHT = 720
+        self.WIN_HEIGHT = 720
         self.width = size[0]
         self.height = size[1]
         self.image = transform.scale(image.load(p_image), size)
@@ -60,16 +60,14 @@ class Alien(GameSprite):
 
 
 class Boss(GameSprite):
-
-    def update(self) -> None:
+    def update(self, bb: sprite.Group) -> None:
         # Left - True, Right - False
         self.direction = True
         if self.rect.x <= 0:
             self.direction = False
         if self.rect.x >= self.WIN_WIDTH - self.width:
             self.direction = True
-        if (abs(self.rect.x - self.point[0]) < 40 
-                and abs(self.rect.y - self.point[1]) < 40):
+        if (abs(self.rect.x - self.point[0]) < 40 and abs(self.rect.y - self.point[1]) < 40):
             self.point = (ri(0, self.WIN_WIDTH - self.width), ri(0, 400))
             a = abs(self.rect.x - self.point[0])
             b = abs(self.rect.y - self.point[1])
@@ -77,16 +75,26 @@ class Boss(GameSprite):
             dem = round(c/self.speed)
             self.x_move = round(a/dem)
             self.y_move = round(b/dem)
-        #self.rect.x += self.x_move if self.rect.x < self.point[0] else -self.x_move
-        #self.rect.y += self.y_move if self.rect.y > self.point[1] else -self.y_move
-        if self.rect.x < self.point[0]: self.rect.x += self.x_move
-        if self.rect.x > self.point[0]: self.rect.x -= self.x_move
-        if self.rect.y < self.point[1]: self.rect.y += self.y_move
-        if self.rect.y > self.point[1]: self.rect.y -= self.y_move
+        if self.rect.x < self.point[0]: 
+            self.rect.x += self.x_move
         
+        if self.rect.x > self.point[0]: 
+            self.rect.x -= self.x_move
+        
+        if self.rect.y < self.point[1]: 
+            self.rect.y += self.y_move
+        
+        if self.rect.y > self.point[1]: 
+            self.rect.y -= self.y_move
+        # firing
+        self.fire(bb)
+
     def fire(self, group: sprite.Group) -> None:
         if ri(0, 500) < 5:
-            group.add(Bullet("bullet180.png", (40, 75), (self.rect.centerx, self.rect.bottom), -10))
+            group.add(Bullet("boss_bullet.png", (80, 150), (self.rect.centerx, self.rect.bottom), -7))
+        for b in group:
+            if b.rect.y > self.WIN_HEIGHT + self.height:
+                group.remove(b)
 
 
 class Asteroid(GameSprite):
@@ -111,10 +119,7 @@ class System():
     Basic checking operations and spawning process. 
     Input variables to be used in text displays.
     """
-    def __init__(self, window: Surface,
-                bullets_group: sprite.Group, 
-                aliens_group: sprite.Group, 
-                ast_group: sprite.Group):
+    def __init__(self, window: Surface):
         self.window = window
         self.width = 1200
         self.height = 720
@@ -123,9 +128,10 @@ class System():
         self.lost_count = 0
         self.timer = 0
         self.fire_cooldown = 25
-        self.bullets = bullets_group
-        self.aliens = aliens_group
-        self.asteroids = ast_group
+        self.bullets = sprite.Group()
+        self.aliens = sprite.Group()
+        self.asteroids = sprite.Group()
+        self.boss_bullets = sprite.Group()
     
     def collision_check(self, player: Player):
         # aliens check
