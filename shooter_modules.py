@@ -40,7 +40,7 @@ class Player(GameSprite):
             self.rect.x += self.speed
 
     def fire(self, b_group: sprite.Group): # changed with surface
-        b_group.add(Bullet("bullet.png", (40, 75), (self.rect.centerx - 20, self.rect.top), 7))
+        b_group.add(Bullet("spritePictures/bullet.png", (40, 75), (self.rect.centerx - 20, self.rect.top), 7))
 
 
 class Bullet(GameSprite):
@@ -67,7 +67,7 @@ class Boss(GameSprite):
             self.direction = False
         if self.rect.x >= self.WIN_WIDTH - self.width:
             self.direction = True
-        if (abs(self.rect.x - self.point[0]) < 40 and abs(self.rect.y - self.point[1]) < 40):
+        if (abs(self.rect.x - self.point[0]) < 40 and abs(self.rect.y - self.point[1]) < 40) or abs(self.y_move) < 1:
             self.point = (ri(0, self.WIN_WIDTH - self.width), ri(0, 400))
             a = abs(self.rect.x - self.point[0])
             b = abs(self.rect.y - self.point[1])
@@ -91,11 +91,7 @@ class Boss(GameSprite):
 
     def fire(self, group: sprite.Group) -> None:
         if ri(0, 500) < 5:
-            group.add(Bullet("boss_bullet.png", (80, 150), (self.rect.centerx, self.rect.bottom), -7))
-        for b in group:
-            if b.rect.y > self.WIN_HEIGHT + self.height:
-                group.remove(b)
-
+            group.add(Bullet("spritePictures/boss_bullet.png", (80, 150), (self.rect.centerx, self.rect.centery), -7))
 
 class Asteroid(GameSprite):
     def update(self):
@@ -153,15 +149,22 @@ class System():
                     self.bullets.remove(elem)
         self.bullets.draw(self.window)
         self.bullets.update()
+        # Boss bullets check
+        for b in self.boss_bullets:
+            if b.rect.y > self.height + b.height:
+                self.boss_bullets.remove(b)
+            if sprite.spritecollide(player, self.boss_bullets, True):
+                self.hp -= 15
+
 
     def random_spawn(self, ri_range: tuple, timer_reset: int, enemy_speed: int):
         if self.timer < 0:
             if not(ri(ri_range[0], ri_range[1])):
-                self.aliens.add(Alien("alien.png",
+                self.aliens.add(Alien("spritePictures/alien.png",
                                 (180, 120), (ri(0, self.width - 180), -100), enemy_speed))
                 self.timer = timer_reset
             elif not(ri(ri_range[0]-4, ri_range[1]+4)):
-                self.asteroids.add(Asteroid("32728.png", 
+                self.asteroids.add(Asteroid("spritePictures/asteroid.png", 
                                     (100, 100), (ri(0, self.width - 100), -200), 3))
         self.timer -= 1
 

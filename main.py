@@ -7,7 +7,7 @@ winWidth = 1200
 winHeight = 900
 window = display.set_mode((winWidth, winHeight)) # Setting the size
 display.set_caption("Sʜᴏᴏᴛᴇʀ", "alien.png") # Name of the window
-background = transform.scale(image.load("skybox.jpg"), (winWidth, winHeight)) # background
+background = transform.scale(image.load("spritePictures/skybox.jpg"), (winWidth, winHeight)) # background
 # System Object
 system = System(window)
 
@@ -24,11 +24,10 @@ killcount: int = 0
 lost_count = 0
 restart_timer = 250
 # Sprites
-boss = Boss("alien.png", (360, 240), (winWidth//2, 10), 5)
-player = Player("spaceship.png", (150, 150), (winWidth // 2, winHeight - 150), 10)
-shield = Shield("shield.png", (200, 200), ((winWidth // 2) - 25, winHeight - 175), 10)
+boss = Boss("spritePictures/alien.png", (360, 240), (winWidth//2, 10), 5)
+player = Player("spritePictures/spaceship.png", (150, 150), (winWidth // 2, winHeight - 150), 10)
+shield = Shield("spritePictures/shield.png", (200, 200), ((winWidth // 2) - 25, winHeight - 175), 10)
 health_bar = HealthBar(winWidth - 530, 20, 500, 35, 100)
-
 
 #~~Text displays~~#
 font.init()
@@ -100,7 +99,7 @@ while game:
         system.asteroids.draw(window)
         system.asteroids.update()
         system.boss_bullets.draw(window)
-        system.boss_bullets.draw()
+        system.boss_bullets.update()
         system.collision_check(player)
         player.show(window)
         player.update(system.bullets)
