@@ -49,8 +49,6 @@ class System():
     def bullets_check(self):
         if sprite.groupcollide(self.bullets, self.aliens, True, True):
             self.killcount += 1
-        if sprite.spritecollide(self.boss, self.bullets, True):
-            self.boss_hp -= 10
         for elem in self.bullets.sprites():
                 if elem.rect.y <= -elem.height:
                     elem.kill()
@@ -63,6 +61,8 @@ class System():
                 bullet.kill()
         if sprite.spritecollide(player, self.boss_bullets, True):
             self.hp -= 15
+        if sprite.spritecollide(self.boss, self.bullets, True):
+            self.boss_hp -= 10
         self.boss_bullets.draw(self.window)
         self.boss_bullets.update()
     # ----Player's actions check

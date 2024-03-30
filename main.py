@@ -65,7 +65,7 @@ while game:
         if keys[K_RETURN]:
             system.reset()
             lvl_play = True
-            lvl_boss = True
+            lvl_1 = True
             menu = False
         elif keys[K_ESCAPE]:
             quit()
