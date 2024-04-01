@@ -14,7 +14,7 @@ mixer.init()
 mixer.music.load("sounds/-Electroman-Adventures-.mp3")
 
 mixer.music.play(loops=-1)
-mixer.music.set_volume(0)
+mixer.music.set_volume(0.5)
 
 #~~~~~~Variables~~~~~~#
 fire_cooldown: int = 0
@@ -84,7 +84,7 @@ while game:
         if lvl_2:
             system.alien_spawn(33, 50)
             system.asteroid_spawn(18, 90)
-            if system.killcount > 100:
+            if system.killcount >= 100:
                 lvl_2 = False
                 lvl_boss = True
         
@@ -97,14 +97,13 @@ while game:
             system.boss.update(system.boss_bullets)
             system.boss_bullets_check(player)
             system.asteroid_spawn(17, 100)
-            if system.boss_hp < 0:
+            if system.boss_hp <= 0:
                 lvl_win = True
                 lvl_play = False
                 lvl_boss = False
         
         system.alien_check(player)
         system.bullets_check()
-        system.boss_bullets_check(player)
         system.player_check(keys, player)
         player.show(window)
         player.update()

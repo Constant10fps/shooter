@@ -12,13 +12,11 @@ class GameSprite(sprite.Sprite):
         self.WIN_WIDTH = 1200
         self.WIN_HEIGHT = 720
         # size and image 
-        self.width = size[0]
-        self.height = size[1]
+        self.width, self.height = size
         self.image = transform.scale(image.load(sprite_image), size)
         # movement
         self.rect = self.image.get_rect()
-        self.rect.x = start_pos[0]
-        self.rect.y = start_pos[1]
+        self.rect.x, self.rect.y = start_pos
         self.speed = speed
         # Boss
         self.point_x = self.rect.x
@@ -101,14 +99,14 @@ class Boss(GameSprite):
             self.fire(bb)
     
     def fire(self, group: sprite.Group) -> None:
-        group.add(Bullet("sprites/boss_bullet.png", (80, 150), (self.rect.centerx, self.rect.centery), -5))
+        group.add(Bullet("sprites/boss_bullet.png", (80, 150), self.rect.center, -5))
 
 
 class HealthBar():
     def __init__(self, x, y, w, h, max_hp) -> None:
         self.x, self.y = x, y
         self.w, self.h = w, h
-        self.hp, self.max_hp = max_hp, max_hp
+        self.max_hp = max_hp
     
     def show(self, hp: int,  surface: Surface):
         ratio = hp / self.max_hp
