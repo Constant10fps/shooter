@@ -1,4 +1,6 @@
 #~~~~~~~Import~~~~~~~~#
+import os
+os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = "hide"
 from system import *
 #~~~~~Background~~~~~~#
 winWidth = 1200
@@ -14,7 +16,8 @@ mixer.init()
 mixer.music.load("sounds/-Electroman-Adventures-.mp3")
 
 mixer.music.play(loops=-1)
-mixer.music.set_volume(0.5)
+MUSIC_VOLUME = 0.3
+mixer.music.set_volume(MUSIC_VOLUME)
 
 #~~~~~~Variables~~~~~~#
 fire_cooldown: int = 0
